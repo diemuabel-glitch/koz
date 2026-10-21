@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11100f">
+  <meta name="description" content="KOZ, le réseau social pour partager des moments, des vidéos et des conversations.">
+  <title>KOZ — partage tes moments</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #171615;
+      --muted: #77736f;
+      --line: #e9e6e2;
+      --paper: #f7f6f4;
+      --card: #fff;
+      --accent: #ff694a;
+      --accent-dark: #e64b31;
+      --accent-soft: #fff0ec;
+      --purple: #7446e8;
+      --shadow: 0 12px 35px rgba(31, 24, 18, .055);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: var(--paper); color: var(--ink); font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    button, input, textarea { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(255, 105, 74, .35); outline-offset: 2px; }
+    [hidden] { display: none !important; }
+    .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--ink); font-size: 24px; font-weight: 900; letter-spacing: -1.6px; text-decoration: none; }
+    .brand-mark { display: grid; width: 35px; height: 35px; place-items: center; border-radius: 12px; background: var(--accent); color: white; font-size: 18px; letter-spacing: -2px; transform: rotate(-5deg); }
+    .topbar { position: sticky; z-index: 5; top: 0; display: flex; height: 68px; align-items: center; justify-content: space-between; gap: 24px; padding: 0 max(24px, calc((100vw - 1440px)/2)); border-bottom: 1px solid var(--line); background: rgba(255,255,255,.94); backdrop-filter: blur(15px); }
+    .topbar-left, .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .search-wrap { position: relative; width: min(360px, 31vw); }
+    .search-wrap input { width: 100%; height: 42px; padding: 0 16px 0 42px; border: 1px solid transparent; border-radius: 999px; background: #f3f2f0; }
+    .search-icon { position: absolute; top: 10px; left: 15px; color: var(--muted); }
+    .icon-btn, .avatar-btn { display: grid; width: 42px; height: 42px; place-items: center; border: 0; border-radius: 50%; background: #f3f2f0; font-size: 17px; }
+    .avatar-btn { background: var(--accent-soft); color: var(--accent-dark); font-weight: 800; }
+    .top-signout { padding: 9px 13px; border: 1px solid var(--line); border-radius: 10px; background: white; font-size: 13px; font-weight: 700; }
+    .app-grid { display: grid; width: min(1440px, 100%); grid-template-columns: 230px minmax(0, 650px) minmax(230px, 300px); gap: 28px; margin: 26px auto; padding: 0 24px; align-items: start; }
+    .left-rail, .right-rail { position: sticky; top: 92px; display: grid; gap: 18px; }
+    .rail-card, .panel { border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
+    .nav-card { display: grid; gap: 5px; padding: 12px; }
+    .nav-link { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border: 0; border-radius: 11px; background: transparent; text-align: left; font-weight: 700; }
+    .nav-link:hover, .nav-link.active { background: var(--accent-soft); color: var(--accent-dark); }
+    .nav-icon { width: 23px; text-align: center; font-size: 19px; }
+    .rail-profile { display: flex; align-items: center; gap: 11px; padding: 15px; }
+    .avatar { display: grid; flex: 0 0 auto; width: 40px; height: 40px; place-items: center; overflow: hidden; border-radius: 50%; background: #f8dbd3; color: #9c3828; font-weight: 800; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .rail-profile strong, .person-copy strong { display: block; overflow: hidden; max-width: 155px; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+    .rail-profile span, .person-copy span { display: block; color: var(--muted); font-size: 12px; }
+    .center { min-width: 0; display: grid; gap: 18px; }
+    .view-heading { display: flex; align-items: end; justify-content: space-between; gap: 10px; }
+    .view-heading h1 { margin: 0; font-size: 26px; letter-spacing: -.8px; }
+    .view-heading p { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+    .stories { display: flex; gap: 15px; overflow-x: auto; padding: 15px 17px; scrollbar-width: thin; }
+    .story { display: grid; flex: 0 0 64px; justify-items: center; gap: 6px; border: 0; background: none; font-size: 11px; }
+    .story-ring { display: grid; width: 58px; height: 58px; place-items: center; border: 2px solid var(--accent); border-radius: 50%; padding: 3px; }
+    .story .avatar { width: 48px; height: 48px; }
+    .story.add .story-ring { border-style: dashed; color: var(--accent); font-size: 25px; }
+    .compose { padding: 17px; }
+    .compose-top { display: flex; gap: 12px; align-items: flex-start; }
+    .compose textarea { min-height: 46px; flex: 1; resize: vertical; padding: 12px 14px; border: 1px solid var(--line); border-radius: 13px; background: #faf9f8; }
+    .compose-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--line); }
+    .media-label, .secondary-btn, .primary-btn, .small-btn { display: inline-flex; min-height: 38px; align-items: center; justify-content: center; gap: 8px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 10px; background: white; font-size: 13px; font-weight: 700; }
+    .media-label { cursor: pointer; }
+    .media-label:hover, .secondary-btn:hover, .small-btn:hover { border-color: #ffc5b8; background: #fff8f5; }
+    .media-label input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+    .primary-btn { border-color: var(--accent); background: var(--accent); color: white; }
+    .primary-btn:hover { border-color: var(--accent-dark); background: var(--accent-dark); }
+    button:disabled { cursor: not-allowed; opacity: .55; }
+    .post-list { display: grid; gap: 16px; }
+    .post { overflow: hidden; }
+    .post-head { display: flex; align-items: center; gap: 11px; padding: 17px 18px 10px; }
+    .post-head .avatar { width: 42px; height: 42px; }
+    .post-author { min-width: 0; flex: 1; }
+    .post-author strong { font-size: 13px; }
+    .post-author time { display: block; color: var(--muted); font-size: 11px; }
+    .post-body { margin: 0; padding: 4px 18px 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .post-media { display: block; width: 100%; max-height: 570px; background: #111; object-fit: contain; }
+    video.post-media { aspect-ratio: 4/5; object-fit: cover; }
+    .post-counts { display: flex; justify-content: space-between; padding: 10px 18px; color: var(--muted); font-size: 12px; }
+    .post-actions { display: flex; margin: 0 14px; border-top: 1px solid var(--line); }
+    .post-action { flex: 1; padding: 11px; border: 0; background: transparent; color: var(--muted); font-weight: 700; }
+    .post-action:hover, .post-action.liked { color: var(--accent-dark); }
+    .comment-list { display: grid; gap: 8px; padding: 0 18px 10px; }
+    .comment { margin: 0; border-radius: 12px; padding: 8px 11px; background: #f6f5f3; font-size: 12px; overflow-wrap: anywhere; }
+    .comment strong { margin-right: 4px; }
+    .comment-form { display: flex; gap: 8px; padding: 9px 16px 15px; }
+    .comment-form input { min-width: 0; flex: 1; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; }
+    .empty-state { padding: 36px 22px; color: var(--muted); text-align: center; }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--ink); font-size: 16px; }
+    .rail-section { padding: 17px; }
+    .rail-section h2 { margin: 0 0 14px; font-size: 14px; }
+    .trend { display: flex; justify-content: space-between; gap: 8px; padding: 9px 0; border-top: 1px solid #f0eeeb; font-size: 12px; }
+    .trend span { color: var(--muted); }
+    .people-list { display: grid; gap: 12px; }
+    .person-row { display: flex; align-items: center; gap: 9px; }
+    .person-row .avatar { width: 35px; height: 35px; }
+    .person-copy { min-width: 0; flex: 1; }
+    .person-copy strong { max-width: 145px; }
+    .small-btn { min-height: 31px; padding: 5px 9px; border-radius: 8px; font-size: 11px; }
+    .small-btn.following { color: var(--accent-dark); }
+    .helper, .status { color: var(--muted); font-size: 12px; }
+    .status { min-height: 18px; margin: 0; }
+    .status[data-state="error"] { color: #b42318; }
+    .status[data-state="success"] { color: #16804a; }
+    .member-search { display: flex; gap: 8px; }
+    .member-search input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+    .members-panel, .profile-panel { padding: 18px; }
+    .members-layout { display: grid; gap: 18px; }
+    .members-layout h2 { margin: 0 0 10px; font-size: 16px; }
+    .member-results, .chat-list, .request-list { display: grid; gap: 10px; }
+    .member-card, .chat-row { display: flex; align-items: center; gap: 10px; padding: 11px; border: 1px solid var(--line); border-radius: 12px; }
+    .chat-row { width: 100%; background: white; text-align: left; }
+    .chat-row:hover { border-color: #ffc5b8; }
+    .chat-row .person-copy { flex: 1; }
+    .request-actions { display: flex; gap: 6px; margin-left: auto; }
+    .profile-cover { height: 130px; border-radius: 13px; background: linear-gradient(125deg, #ff8d62, #ed5c74 52%, #7446e8); }
+    .profile-main { display: flex; align-items: end; gap: 14px; margin: -28px 16px 0; }
+    .profile-main .avatar { width: 78px; height: 78px; border: 4px solid white; font-size: 22px; }
+    .profile-details { padding: 12px 17px 18px; }
+    .profile-details h2 { margin: 0; }
+    .profile-details p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .profile-stats { display: flex; gap: 25px; margin-top: 13px; font-size: 13px; }
+    .profile-stats strong { margin-right: 4px; }
+    .videos-feed .post { min-height: 360px; }
+    .videos-feed video.post-media { max-height: 660px; }
+    .landing { display: grid; min-height: calc(100vh - 68px); grid-template-columns: 1.2fr minmax(300px, 420px); align-items: center; gap: 48px; width: min(1120px, calc(100% - 40px)); margin: auto; padding: 55px 0; }
+    .landing-copy .eyebrow { color: var(--accent-dark); font-size: 12px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; }
+    .landing-copy h1 { max-width: 620px; margin: 15px 0; font-size: clamp(42px, 6vw, 76px); line-height: 1.02; letter-spacing: -4px; }
+    .landing-copy h1 span { color: var(--accent); }
+    .landing-copy p { max-width: 550px; color: var(--muted); font-size: 17px; }
+    .feature-pills { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 24px; }
+    .feature-pills span { padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: white; font-size: 12px; font-weight: 700; }
+    .auth-card { padding: 26px; }
+    .auth-card h2 { margin: 0 0 5px; font-size: 23px; }
+    .auth-card > p { margin: 0 0 20px; color: var(--muted); font-size: 13px; }
+    .auth-form { display: grid; gap: 13px; }
+    .auth-form label { display: grid; gap: 6px; font-size: 12px; font-weight: 700; }
+    .auth-form input { width: 100%; height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: white; }
+    .auth-form .primary-btn { min-height: 44px; margin-top: 5px; }
+    .auth-toggle { width: 100%; margin-top: 14px; border: 0; background: none; color: var(--accent-dark); font-size: 13px; font-weight: 700; }
+    .auth-status { margin-top: 12px; }
+    .auth-foot { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .modal { width: min(760px, calc(100% - 28px)); max-height: min(90vh, 800px); padding: 0; overflow: auto; border: 0; border-radius: 19px; box-shadow: 0 24px 80px rgba(0,0,0,.22); }
+    .modal::backdrop { background: rgba(20,18,17,.6); backdrop-filter: blur(4px); }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+    .modal-head h2 { margin: 0; font-size: 18px; }
+    .modal-body { padding: 18px; }
+    .call-videos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .call-videos video { width: 100%; max-height: 56vh; aspect-ratio: 4/3; border-radius: 13px; background: #171615; object-fit: cover; }
+    .call-label { margin: 12px 0; color: var(--muted); text-align: center; }
+    .call-actions { display: flex; justify-content: center; gap: 10px; }
+    .danger-btn { background: #b42318; border-color: #b42318; color: white; }
+    .incoming-controls { display: flex; justify-content: center; gap: 10px; padding: 18px; }
+    .toast { position: fixed; z-index: 8; right: 22px; bottom: 22px; max-width: min(400px, calc(100vw - 44px)); padding: 12px 16px; border-radius: 12px; background: #222; color: white; box-shadow: var(--shadow); }
+    footer { padding: 24px; color: var(--muted); text-align: center; font-size: 12px; }
+    @media (max-width: 1050px) {
+      .app-grid { grid-template-columns: 190px minmax(0, 650px); justify-content: center; }
+      .right-rail { display: none; }
+      .landing { gap: 25px; }
+    }
+    @media (max-width: 700px) {
+      .topbar { height: 60px; gap: 10px; padding: 0 14px; }
+      .topbar-left { gap: 8px; }
+      .brand { font-size: 21px; }
+      .search-wrap { width: min(40vw, 230px); }
+      .search-wrap input { height: 38px; padding-left: 35px; font-size: 12px; }
+      .search-icon { top: 8px; left: 12px; }
+      .top-signout { padding: 8px; font-size: 11px; }
+      .topbar-right { gap: 7px; }
+      .app-grid { display: block; margin: 14px auto 80px; padding: 0 12px; }
+      .left-rail { position: fixed; z-index: 5; right: 0; bottom: 0; left: 0; top: auto; display: block; }
+      .rail-profile, .left-rail > .rail-card:not(.nav-card) { display: none; }
+      .nav-card { display: flex; justify-content: space-around; gap: 0; padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); border-radius: 0; border-right: 0; border-bottom: 0; border-left: 0; }
+      .nav-link { flex: 1; flex-direction: column; gap: 1px; padding: 7px 2px; font-size: 9px; }
+      .nav-icon { font-size: 18px; }
+      .center { gap: 12px; }
+      .landing { min-height: auto; grid-template-columns: 1fr; gap: 28px; padding: 43px 0; }
+      .landing-copy h1 { font-size: 51px; letter-spacing: -2.8px; }
+      .landing-copy p { font-size: 15px; }
+      .auth-card { padding: 21px; }
+      .view-heading h1 { font-size: 22px; }
+      .stories { gap: 10px; padding: 12px; }
+      .compose { padding: 13px; }
+      .post-head { padding: 14px 14px 9px; }
+      .post-body { padding-right: 14px; padding-left: 14px; }
+      .call-videos { grid-template-columns: 1fr; }
+      .call-videos video { max-height: 34vh; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a class="brand" href="#" aria-label="KOZ, accueil"><span class="brand-mark">k.</span><span>KOZ</span></a>
+      <label class="search-wrap" aria-label="Rechercher des membres">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input id="global-search" type="search" placeholder="Trouver des personnes…" autocomplete="off">
+      </label>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="new-post-focus" type="button" aria-label="Créer une publication" title="Créer">＋</button>
+      <button class="avatar-btn" id="top-avatar" type="button" aria-label="Mon profil">?</button>
+      <button class="top-signout" id="sign-out" type="button" hidden>Déconnexion</button>
+    </div>
+  </header>
+
+  <section class="landing" id="landing">
+    <div class="landing-copy">
+      <p class="eyebrow">Le monde est plus proche</p>
+      <h1>Partage tes moments.<br><span>Reste connecté.</span></h1>
+      <p>KOZ rassemble tes amis, tes vidéos et tes conversations dans un seul espace. Publie, découvre et appelle les personnes qui comptent.</p>
+      <div class="feature-pills"><span>✦ Fil d’actualité</span><span>▶ Vidéos courtes</span><span>◉ Appels audio & vidéo</span></div>
+    </div>
+    <section class="auth-card panel" aria-labelledby="auth-heading">
+      <h2 id="auth-heading">Rejoins KOZ</h2>
+      <p>Connecte-toi pour retrouver ta communauté.</p>
+      <form class="auth-form" id="auth-form">
+        <label id="name-field">Ton nom
+          <input id="auth-name" name="name" type="text" minlength="2" maxlength="40" autocomplete="nickname" required>
+        </label>
+        <label>Adresse e-mail
+          <input id="auth-email" name="email" type="email" maxlength="254" autocomplete="email" required>
+        </label>
+        <label>Mot de passe
+          <input id="auth-password" name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+        </label>
+        <label id="password-confirm-field">Confirme ton mot de passe
+          <input id="auth-password-confirm" name="password-confirm" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+        </label>
+        <button class="primary-btn" id="auth-submit" type="submit">Créer mon compte</button>
+      </form>
+      <button class="auth-toggle" id="auth-toggle" type="button">J’ai déjà un compte — me connecter</button>
+      <p class="status auth-status" id="auth-status" role="status" aria-live="polite">Connexion sécurisée par Supabase.</p>
+      <p class="auth-foot">En continuant, tu acceptes que ton profil, tes publications et tes interactions soient enregistrés pour les partager avec la communauté KOZ. Évite de publier des informations sensibles.</p>
+    </section>
+  </section>
+
+  <div class="app-grid" id="app" hidden>
+    <aside class="left-rail">
+      <div class="rail-card rail-profile">
+        <div class="avatar" id="rail-avatar">K</div>
+        <div><strong id="rail-name">Mon profil</strong><span>Connecté à KOZ</span></div>
+      </div>
+      <nav class="rail-card nav-card" aria-label="Navigation principale">
+        <button class="nav-link active" type="button" data-view="feed"><span class="nav-icon">⌂</span>Accueil</button>
+        <button class="nav-link" type="button" data-view="videos"><span class="nav-icon">▶</span>Vidéos</button>
+        <button class="nav-link" type="button" data-view="members"><span class="nav-icon">♧</span>Amis & messages</button>
+        <button class="nav-link" type="button" data-view="profile"><span class="nav-icon">◉</span>Mon profil</button>
+      </nav>
+      <section class="rail-card rail-section">
+        <h2>Ton espace</h2>
+        <p class="helper">Partage des photos, des vidéos et des nouvelles avec ta communauté.</p>
+      </section>
+    </aside>
+
+    <main class="center">
+      <section id="feed-view" class="view">
+        <div class="view-heading"><div><h1>Ton fil</h1><p>Les moments de ta communauté, tout près.</p></div></div>
+        <section class="panel stories" aria-label="Moments récents">
+          <button class="story add" type="button" id="story-add"><span class="story-ring">＋</span><span>Ton moment</span></button>
+          <div class="story"><span class="story-ring"><span class="avatar">A</span></span><span>Amis</span></div>
+          <div class="story"><span class="story-ring"><span class="avatar">M</span></span><span>Musique</span></div>
+          <div class="story"><span class="story-ring"><span class="avatar">V</span></span><span>Voyages</span></div>
+          <div class="story"><span class="story-ring"><span class="avatar">C</span></span><span>Créateurs</span></div>
+          <div class="story"><span class="story-ring"><span class="avatar">+</span></span><span>Découvrir</span></div>
+        </section>
+        <form class="panel compose" id="post-form">
+          <div class="compose-top">
+            <div class="avatar" id="composer-avatar">K</div>
+            <textarea id="post-body" maxlength="2000" placeholder="Quoi de neuf dans ton monde ?" aria-label="Contenu de la publication"></textarea>
+          </div>
+          <div class="compose-actions">
+            <label class="media-label">▧ Photo / vidéo
+              <input id="post-media" type="file" accept="image/*,video/*">
+            </label>
+            <span class="helper" id="media-name">Jusqu’à 50 Mo</span>
+            <button class="primary-btn" id="post-submit" type="submit">Publier</button>
+          </div>
+          <p class="status" id="post-status" role="status" aria-live="polite"></p>
+        </form>
+        <div class="post-list" id="feed-list" aria-live="polite"></div>
+      </section>
+
+      <section id="videos-view" class="view" hidden>
+        <div class="view-heading"><div><h1>À découvrir</h1><p>Les vidéos partagées par la communauté KOZ.</p></div></div>
+        <div class="post-list videos-feed" id="videos-list" aria-live="polite"></div>
+      </section>
+
+      <section id="members-view" class="view" hidden>
+        <div class="view-heading"><div><h1>Amis & messages</h1><p>Rencontre des personnes et lance une conversation.</p></div></div>
+        <section class="panel members-panel members-layout">
+          <div>
+            <h2>Découvrir des personnes</h2>
+            <form class="member-search" id="member-search-form">
+              <input id="member-search" type="search" minlength="2" maxlength="40" placeholder="Nom ou pseudo…" required>
+              <button class="primary-btn" type="submit">Rechercher</button>
+            </form>
+            <p class="status" id="member-status" role="status" aria-live="polite"></p>
+            <div class="member-results" id="member-results"></div>
+          </div>
+          <div>
+            <h2>Demandes reçues</h2>
+            <div class="request-list" id="request-list"></div>
+          </div>
+          <div>
+            <h2>Mes conversations</h2>
+            <div class="chat-list" id="chat-list"></div>
+            <div class="panel" id="chat-panel" hidden>
+              <div class="modal-head"><h2 id="chat-title">Conversation</h2><button class="icon-btn" type="button" id="chat-close" aria-label="Fermer">×</button></div>
+              <div class="modal-body">
+                <div id="chat-messages" class="chat-list" aria-live="polite"></div>
+                <div class="call-actions" style="margin:12px 0">
+                  <button class="secondary-btn" type="button" id="audio-call">☎ Appel audio</button>
+                  <button class="secondary-btn" type="button" id="video-call">▣ Appel vidéo</button>
+                </div>
+                <form class="member-search" id="message-form"><input id="message-input" maxlength="2000" placeholder="Écrire un message…" required><button class="primary-btn" type="submit">Envoyer</button></form>
+                <p class="status" id="chat-status" role="status"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="profile-view" class="view" hidden>
+        <div class="view-heading"><div><h1>Mon profil</h1><p>Ta présence sur KOZ.</p></div></div>
+        <section class="panel profile-panel">
+          <div class="profile-cover"></div>
+          <div class="profile-main"><div class="avatar" id="profile-avatar">K</div></div>
+          <div class="profile-details">
+            <h2 id="profile-name">Mon profil</h2><p id="profile-email"></p>
+            <div class="profile-stats"><span><strong id="profile-post-count">0</strong> publications</span><span><strong id="profile-follower-count">0</strong> abonnés</span><span><strong id="profile-following-count">0</strong> abonnements</span></div>
+          </div>
+        </section>
+        <div class="post-list" id="profile-posts"></div>
+      </section>
+    </main>
+
+    <aside class="right-rail">
+      <section class="rail-card rail-section">
+        <h2>En tendance</h2>
+        <div class="trend"><strong>#Kinshasa</strong><span>Communauté</span></div>
+        <div class="trend"><strong>#Créativité</strong><span>À découvrir</span></div>
+        <div class="trend"><strong>#KOZmoments</strong><span>En ce moment</span></div>
+      </section>
+      <section class="rail-card rail-section">
+        <h2>À suivre</h2>
+        <div class="people-list" id="suggested-list"></div>
+        <p class="helper" id="suggested-empty">Les nouveaux membres apparaîtront ici.</p>
+      </section>
+      <p class="helper">KOZ · Partage avec respect. Bloque ou signale toute interaction indésirable.</p>
+    </aside>
+  </div>
+  <footer id="page-footer">KOZ — Connecte-toi à ce qui compte.</footer>
+
+  <dialog class="modal" id="call-dialog" aria-labelledby="call-title">
+    <div class="modal-head"><h2 id="call-title">Appel KOZ</h2><button class="icon-btn" type="button" id="call-close" aria-label="Fermer">×</button></div>
+    <div class="modal-body">
+      <div class="call-videos"><video id="remote-video" autoplay playsinline></video><video id="local-video" autoplay muted playsinline></video></div>
+      <p class="call-label" id="call-status" role="status" aria-live="polite">Connexion…</p>
+      <div class="call-actions"><button class="primary-btn danger-btn" type="button" id="call-end">Terminer l’appel</button></div>
+    </div>
+  </dialog>
+  <dialog class="modal" id="incoming-dialog" aria-labelledby="incoming-title">
+    <div class="modal-head"><h2 id="incoming-title">Appel entrant</h2></div>
+    <p class="call-label" id="incoming-label">Quelqu’un t’appelle…</p>
+    <div class="incoming-controls"><button class="primary-btn" id="call-accept" type="button">Répondre</button><button class="primary-btn danger-btn" id="call-decline" type="button">Refuser</button></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="supabase-config.js"></script>
+  <script type="module" src="auth.js"></script>
+</body>
+</html>
